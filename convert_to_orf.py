@@ -12,10 +12,6 @@ class SequenceHandler():
         """
         Return errors if unexepcted nucleotides are encountered in the given sequence.
 
-        :param seq_set: nucleotide sequence
-        :param check_set: set to check against for membership testing
-        :type seq_set: array
-        :type check_set: set
         :return: error message
         :rtype: str
         """
@@ -35,16 +31,40 @@ class SequenceHandler():
         return error_messages[error_key]
 
     def get_start_codon_indices(self, frame_number):
+        """
+        Return a list of start codon indices in the given reading frame.
+        
+        :param frame_number: The reading frame
+        :type frame_number: int
+        :return: A list of start codon indices.
+        :rtype: list[int]
+        """
         seq_frame = self.seq[frame_number:]
         start_codon_indices = [index for index in range(frame_number, len(seq_frame)) if seq_frame[index: index + 3] == "ATG"]
         return start_codon_indices
 
     def get_end_codon_indices(self, frame_number):
+        """
+        Return a list of end codon indices in the given reading frame.
+        
+        :param frame_number: The reading frame
+        :type frame_number: int
+        :return: A list of end codon indices.
+        :rtype: list[int]
+        """
         seq_frame = self.seq[frame_number:]
         stop_codon_indicies = [index for index in range(frame_number, len(seq_frame)) if seq_frame[index: index + 3] in ["TGA", "TAA", "TAG"]]
         return stop_codon_indicies
     
     def get_orfs(self, frame_number = 0):
+        """
+        Return a list of Open Reading Frames (ORFs) in the given reading frame.
+        
+        :param frame_number: The reading frame
+        :type frame_number: int
+        :return: A list of ORFs.
+        :rtype: list[tuple[int, int, str, int]]
+        """
         seq_frame = self.seq[frame_number:]
         start_codon_indices = self.get_start_codon_indices(frame_number) 
         end_codon_indicies = self.get_end_codon_indices(frame_number)
@@ -64,6 +84,14 @@ class SequenceHandler():
         return orfs
     
     def print_orf_table(self, paired_list):
+        """
+        Prints a table with ORF data.
+
+        :param paired_list: A list of tuples where each tuple contains the frame number, start index, nucleotide sequence, and ORF length.
+        :type paired_list: list of tuples
+        :return: None
+        :rtype: None
+        """
         headers = ("frame_number", "start_index", "nucleotide_seq", "seq_length")
         col_widths = []
         for i in range(len(headers)):
