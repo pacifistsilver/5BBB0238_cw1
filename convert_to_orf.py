@@ -1,4 +1,4 @@
-file_path = "data\dnasequence_test.txt"
+file_path = "data\dnasequence.txt"
 
 with open(file_path, "r") as f:
     data = f.read().strip("\n")
@@ -37,10 +37,9 @@ class SequenceHandler():
     def get_start_codon_indices(self, frame_number):
         seq_frame = self.seq[frame_number:]
         start_codon_indices = [index for index in range(frame_number, len(seq_frame)) if seq_frame[index: index + 3] == "ATG"]
-        print(frame_number, self.seq[frame_number:])
         return start_codon_indices
 
-    def get_end_codon_indicies(self, frame_number):
+    def get_end_codon_indices(self, frame_number):
         seq_frame = self.seq[frame_number:]
         stop_codon_indicies = [index for index in range(frame_number, len(seq_frame)) if seq_frame[index: index + 3] in ["TGA", "TAA", "TAG"]]
         return stop_codon_indicies
@@ -48,8 +47,7 @@ class SequenceHandler():
     def get_orfs(self, frame_number = 0):
         seq_frame = self.seq[frame_number:]
         start_codon_indices = self.get_start_codon_indices(frame_number) 
-        end_codon_indicies = self.get_end_codon_indicies(frame_number)
-        print(start_codon_indices, end_codon_indicies)
+        end_codon_indicies = self.get_end_codon_indices(frame_number)
 
         orfs = [] 
         for start_index in start_codon_indices:
@@ -61,14 +59,30 @@ class SequenceHandler():
 
             if end_index is not None:
                 orf = seq_frame[start_index:end_index]
-                orfs.append((start_index, orf))
+                orfs.append((frame_number + 1, start_index, orf, len(orf)))
         
         return orfs
     
+    def print_orf_table(self, paired_list):
+        headers = ("frame_number", "start_index", "nucleotide_seq", "seq_length")
+        col_widths = []
+        for i in range(len(headers)):
+            max_len = max(len(str(row[i])) for row in paired_list + [headers])
+            col_widths.append(max_len + 2)
+
+        row_format = "".join(["{:<" + str(width) + "}" for width in col_widths])
+        print(row_format.format(*headers))
+
+        for row in paired_list:
+            print(row_format.format(*row, len(row[2])))
+
+    def determine_mutation(self): 
+        pass   
+
 handler = SequenceHandler(data)
 
 if __name__ == "__main__": 
-    orf = []
     for x in range(3):
-        orf.append(handler.get_orfs(x))
-    print(orf)
+        orf_data = handler.get_orfs(x)
+        print("\n")
+        handler.print_orf_table(orf_data)
