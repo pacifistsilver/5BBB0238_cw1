@@ -1,4 +1,4 @@
-file_path = "data\dnasequence.txt"
+file_path = "data\dnasequence_test.txt"
 
 with open(file_path, "r") as f:
     data = f.read().strip("\n")
@@ -40,7 +40,7 @@ class SequenceHandler():
         :rtype: list[int]
         """
         seq_frame = self.seq[frame_number:]
-        start_codon_indices = [index for index in range(frame_number, len(seq_frame)) if seq_frame[index: index + 3] == "ATG"]
+        start_codon_indices = [index for index in range(0, len(seq_frame), 3) if seq_frame[index: index + 3] == "ATG"]
         return start_codon_indices
 
     def get_end_codon_indices(self, frame_number):
@@ -53,7 +53,7 @@ class SequenceHandler():
         :rtype: list[int]
         """
         seq_frame = self.seq[frame_number:]
-        stop_codon_indicies = [index for index in range(frame_number, len(seq_frame)) if seq_frame[index: index + 3] in ["TGA", "TAA", "TAG"]]
+        stop_codon_indicies = [index for index in range(0, len(seq_frame), 3) if seq_frame[index: index + 3] in ["TGA", "TAA", "TAG"]]
         return stop_codon_indicies
     
     def get_orfs(self, frame_number = 0):
@@ -68,7 +68,6 @@ class SequenceHandler():
         seq_frame = self.seq[frame_number:]
         start_codon_indices = self.get_start_codon_indices(frame_number) 
         end_codon_indicies = self.get_end_codon_indices(frame_number)
-
         orfs = [] 
         for start_index in start_codon_indices:
             end_index = None
@@ -79,8 +78,7 @@ class SequenceHandler():
 
             if end_index is not None:
                 orf = seq_frame[start_index:end_index]
-                orfs.append((frame_number + 1, start_index, orf, len(orf)))
-        
+                orfs.append((frame_number + 1, (start_index + frame_number) + 1, orf, len(orf)))
         return orfs
     
     def print_orf_table(self, paired_list):
@@ -92,7 +90,7 @@ class SequenceHandler():
         :return: None
         :rtype: None
         """
-        headers = ("frame_number", "start_index", "nucleotide_seq", "seq_length")
+        headers = ("Frame", "Base Number", "Sequence", "Sequence Length")
         col_widths = []
         for i in range(len(headers)):
             max_len = max(len(str(row[i])) for row in paired_list + [headers])
