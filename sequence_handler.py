@@ -97,6 +97,7 @@ class SequenceHandler():
             col_widths.append(max_len + 2)
 
         row_format = "".join(["{:<" + str(width) + "}" for width in col_widths])
+        
         print(row_format.format(*headers))
 
         for row in paired_list:
@@ -110,5 +111,5 @@ handler = SequenceHandler(data)
 if __name__ == "__main__": 
     for x in range(3):
         orf_data = handler.get_orfs(x)
-        print("\n")
-        handler.print_orf_table(orf_data)
+        if orf_data:
+            handler.print_orf_table(orf_data)
